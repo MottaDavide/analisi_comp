@@ -1,0 +1,6 @@
+1) Tenere solo il primo ordine come davvero primo ordine (quindi mettere week_inside_first=1)
+2) Cosa è per noi il primo ordine? Il primo ordine in senso temporale? O il primo ordine più grande che vedo?
+3) Come gestire outlier? Dovremmo isolare i primi ordini e trovare le treshold con queste informazioni e non tutto l'ordinato di una data combianzione
+4) Attenzione al campo customer... probabilmente è troppo aggregato perchè potrei avere più porte al suo interno
+5) Cosa è un ordine per noi? Una riga d'ordine? Tutti gli ordini in una data creation date?
+6) Come dobbiamo leggere i dati?
