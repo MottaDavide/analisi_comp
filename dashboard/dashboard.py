@@ -6,23 +6,29 @@ import plotly.express as px
 sys.path.append(str(Path('').absolute().parents[0]))
 
 import pandas as pd
-path_output = Path('/Volumes/share/Gruppo_Demand_Planning/02_NPI/DB WHOLESALE NPI/ANALISI COMP NEW')
-df = pd.read_excel(path_output / 'df_comp_cleaned.xlsx', nrows=5000, dtype={'common_creation_yearweek': str, 'common_planned_delivery_yearweek': str})
-
-
 
 st.set_page_config(page_title="Sales Dashboard",
                 page_icon=":smile:",
                 layout="wide")
 
+@st.cache_data
+def get_data():
+    df = pd.read_excel(Path('').absolute() / 'data' /'output'/ 'df_comp_cleaned.xlsx', dtype={'common_creation_yearweek': str, 'common_planned_delivery_yearweek': str}, nrows=5000)
+    
+    return df
+
+df = get_data()
+
+
+
 
 # ------ SIDEBAR ---------
 st.sidebar.header("Please Filter Here: ")
-brand = st.sidebar.multiselect(
+brand = st.sidebar.selectbox(
     "Select the Brand:",
-    options=df.brand.unique(),
-    default=df.brand.unique()
+    options=df.brand.unique()
 )
+
 
 release = st.sidebar.multiselect(
     "Select the Release:",
@@ -66,7 +72,7 @@ st.markdown("---")
 
 
 sales_by_creation = (
-    df_selection[df_selection.common_creation_yearweek > '202400'].groupby(by = ['common_creation_yearweek', 'release'], as_index=False)['qty'].sum()
+    df_selection[df_selection.common_creation_yearweek > '202400'].groupby(by = ['common_creation_yearweek', 'release'], as_index=False)['qty'].sum().sort_values('release')
 )
 fig_sales_by_creation = px.bar(
     sales_by_creation,
@@ -82,7 +88,7 @@ fig_sales_by_creation = px.bar(
 
 
 sales_by_delivery = (
-    df_selection[df_selection.common_creation_yearweek > '202400'].groupby(by = ['common_planned_delivery_yearweek', 'release'], as_index=False)['qty'].sum()
+    df_selection[df_selection.common_creation_yearweek > '202400'].groupby(by = ['common_planned_delivery_yearweek', 'release'], as_index=False)['qty'].sum().sort_values('release')
 )
 fig_sales_by_delivery = px.bar(
     sales_by_delivery,
@@ -92,10 +98,12 @@ fig_sales_by_delivery = px.bar(
     orientation='v',
     title="<b>Sales by Delivery Date</b>",
     template='plotly_white',
-    labels={'common_creation_yearweek': 'Delivery Date (W)', 'qty': 'Qty'},
+    labels={'common_planned_delivery_yearweek': 'Delivery Date (W)', 'qty': 'Qty'},
     barmode='group'
 )
 
 left_col, right_col = st.columns(2)
 left_col.plotly_chart(fig_sales_by_creation)
 right_col.plotly_chart(fig_sales_by_delivery)
+
+st.markdown("---")
